@@ -2,7 +2,6 @@
 import {
     Dialog,
     DialogContent,
-    DialogClose,
     DialogDescription,
     DialogFooter,
     DialogHeader,
@@ -21,10 +20,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 import FileUpload from "../file-upload";
-import axios from 'axios'
-import { useRouter } from 'next/navigation'
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useModal } from "@/hooks/use-modal-hooks";
 
 const formSchema = z.object({
     name: z.string().min(1, {
@@ -35,9 +34,9 @@ const formSchema = z.object({
     }),
 });
 
-const InitialModal = () => {
-    const [isMounted, setIsMounted] = useState(false);
-    const router = useRouter()
+const CreateServerModel = () => {
+    const router = useRouter();
+    const { isOpen, onClose, type } = useModal();
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -45,28 +44,27 @@ const InitialModal = () => {
             imageUrl: "",
         },
     });
+    const isModalOpen = isOpen && type === "createServer";
     const isLoading = form.formState.isSubmitting;
 
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
-    
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            await axios.post('api/servers', values)
-            
-            form.reset()
-            router.refresh()
-            window.location.reload()
-        } catch(e) {
-            console.log(e)
+            await axios.post("/api/servers", values);
+            form.reset();
+            router.refresh();
+            onClose()
+        } catch (e) {
+            console.log(e);
         }
     };
 
-    if (!isMounted) return null;
+    const handleClose = () => {
+        form.reset();
+        onClose()
+    };
 
     return (
-        <Dialog open>
+        <Dialog open={isModalOpen} onOpenChange={handleClose}>
             <DialogContent className="bg-white text-black p-0 overflow-hidden">
                 <DialogHeader className="pt-8 px-6">
                     <DialogTitle className="text-2xl text-center font-bold">
@@ -134,4 +132,4 @@ const InitialModal = () => {
     );
 };
 
-export default InitialModal;
+export default CreateServerModel;
