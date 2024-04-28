@@ -5,7 +5,7 @@ import ActionTooltip from '@/components/action-tooltip'
 import { useModal } from '@/hooks/use-modal-hooks'
 
 const NavigationAction = () => {
-    const {onOpen} = useModal()
+    const { onOpen } = useModal()
 
     return (
         <div>

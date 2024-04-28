@@ -8,8 +8,8 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
 import {
     Form,
     FormControl,
@@ -18,12 +18,12 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
 import FileUpload from "../file-upload";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useModal } from "@/hooks/use-modal-hooks";
+import {useRouter} from "next/navigation";
+import {useModal} from "@/hooks/use-modal-hooks";
 
 const formSchema = z.object({
     name: z.string().min(1, {
@@ -36,7 +36,7 @@ const formSchema = z.object({
 
 const CreateServerModel = () => {
     const router = useRouter();
-    const { isOpen, onClose, type } = useModal();
+    const {isOpen, onClose, type} = useModal();
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -85,7 +85,7 @@ const CreateServerModel = () => {
                                 <FormField
                                     control={form.control}
                                     name="imageUrl"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormControl>
                                                 <FileUpload
@@ -102,9 +102,10 @@ const CreateServerModel = () => {
                             <FormField
                                 control={form.control}
                                 name="name"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
-                                        <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70">
+                                        <FormLabel
+                                            className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70">
                                             Server name
                                         </FormLabel>
                                         <FormControl>
@@ -115,7 +116,7 @@ const CreateServerModel = () => {
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
