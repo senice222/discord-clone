@@ -42,7 +42,7 @@ const MembersModal = () => {
     const isModalOpen = isOpen && type === "members";
     const {server} = data as { server: ServerWithMembersWithProfiles }
     const [loadingId, setLoadingId] = useState("");
-
+    
     const onRoleChange = async (role: MemberRule, memberId: string) => {
         try {
             setLoadingId(memberId)
