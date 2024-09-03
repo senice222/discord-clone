@@ -28,7 +28,7 @@ const ServerSearch: FC<ServerSearchProps> = ({ data }) => {
     const [search, setSearch] = useState<string>('');
     const router = useRouter()
     const params = useParams()
-
+    
     const handleToggle = () => setOpen(prev => !prev);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
 

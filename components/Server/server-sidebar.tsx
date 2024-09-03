@@ -1,12 +1,15 @@
-import {currentProfile} from '@/lib/current-profile';
-import {db} from '@/lib/db';
-import {ChannelType, MemberRule} from '@prisma/client';
-import {redirect} from 'next/navigation';
+import { currentProfile } from '@/lib/current-profile';
+import { db } from '@/lib/db';
+import { ChannelType, MemberRule } from '@prisma/client';
+import { redirect } from 'next/navigation';
 import React from 'react'
 import ServerHeader from './server-header';
-import {ScrollArea} from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import ServerSearch from "@/components/Server/server-search";
-import {Hash, Mic, ShieldAlert, ShieldCheck, Video} from "lucide-react";
+import { Hash, Mic, ShieldAlert, ShieldCheck, Video } from "lucide-react";
+import { Separator } from '@/components/ui/separator';
+import ServerSection from './server-section';
+import ServerChannel from './server-channel';
 
 interface ServerSidebarProps {
     serverId: string;
@@ -24,7 +27,7 @@ const roleIconMap = {
     [MemberRule.ADMIN]: <ShieldAlert className={"h-4 w-4 mr-2 text-rose-500"} />,
 }
 
-const ServerSidebar = async ({serverId}: ServerSidebarProps) => {
+const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
     const profile = await currentProfile()
 
     if (!profile) {
@@ -113,6 +116,27 @@ const ServerSidebar = async ({serverId}: ServerSidebarProps) => {
                         ]}
                     />
                 </div>
+                <Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2" />
+                {
+                    !!textChannels?.length && (
+                        <div className='mb-2'>
+                            <ServerSection
+                                sectionType='channels'
+                                label='Text Channels'
+                                role={role}
+                                channelType={ChannelType.TEXT}
+                            />
+                            {textChannels.map((channel) => (
+                                <ServerChannel 
+                                    key={channel.id}
+                                    channel={channel}
+                                    role={role}
+                                    server={server}
+                                />
+                            ))}
+                        </div>
+                    )
+                }
             </ScrollArea>
         </div>
     )
