@@ -31,7 +31,7 @@ const ServerSection: FC<ServerSectionProps> = ({
             {
                 role !== MemberRule.GUEST && sectionType === "channels" && (
                     <ActionTooltip label="Create channel" side="top">
-                        <button onClick={() => onOpen("createChannel")} className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition">
+                        <button onClick={() => onOpen("createChannel", {channelType})} className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition">
                             <Plus className="w-4 h-4" />
                         </button>
                     </ActionTooltip>
@@ -39,7 +39,7 @@ const ServerSection: FC<ServerSectionProps> = ({
             }
             {
                 role === MemberRule.ADMIN && sectionType === "members" && (
-                    <ActionTooltip label="Create channel" side="top">
+                    <ActionTooltip label="Manage Members" side="top">
                         <button onClick={() => onOpen("members", {server})} className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition">
                             <Settings className="w-4 h-4" />
                         </button>
