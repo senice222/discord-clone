@@ -1,14 +1,6 @@
 "use client"
 import { FC, ReactNode, useEffect, useState } from "react";
 import { Search } from "lucide-react";
-import {
-    CommandDialog,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command"
 import { useParams, useRouter } from "next/navigation";
 
 interface ServerSearchProps {
@@ -28,7 +20,7 @@ const ServerSearch: FC<ServerSearchProps> = ({ data }) => {
     const [search, setSearch] = useState<string>('');
     const router = useRouter()
     const params = useParams()
-    
+
     const handleToggle = () => setOpen(prev => !prev);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
 
