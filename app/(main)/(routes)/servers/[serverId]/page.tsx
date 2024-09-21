@@ -1,7 +1,7 @@
 import { currentProfile } from '@/lib/current-profile';
 import { db } from '@/lib/db';
 import { redirect } from 'next/navigation';
-import React, { FC } from 'react'
+import { FC } from 'react'
 
 interface ServerIdPageProps {
     params: {
