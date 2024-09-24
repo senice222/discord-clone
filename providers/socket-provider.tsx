@@ -21,8 +21,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     const [isConnected, setIsConnected] = useState(false)
 
     useEffect(() => {
-        console.log("Подключаемся к", process.env.NEXT_PUBLIC_SITE_URL)
-
         const socketInstance = new (ClientIO as any)(process.env.NEXT_PUBLIC_SITE_URL!, {
             path: "/api/socket/io",
             addTrailingSlash: false
@@ -31,11 +29,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         socketInstance.on("connect", () => {
             setIsConnected(true);
         });
-
         socketInstance.on("disconnect", () => {
             setIsConnected(false);
         });
-
         socketInstance.on("connect_error", (error: any) => {
             console.log("Error during connection:", error);
         });
@@ -43,7 +39,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         setSocket(socketInstance);
 
         return () => {
-            console.log("Отключаем соединение")
             socketInstance.disconnect();
         };
     }, []);
