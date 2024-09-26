@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 import ModalProvider from '@/providers/modal-provider'
 import { SocketProvider } from "@/providers/socket-provider";
+import { QueryProvider } from "@/providers/query-provider";
 
 const font = Open_Sans({ subsets: ["latin"] });
 
@@ -32,7 +33,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                     >
                         <SocketProvider>
                             <ModalProvider />
-                            {children}
+                            <QueryProvider>
+                                {children}
+                            </QueryProvider>
                         </SocketProvider>
                     </ThemeProvider>
                 </body>
