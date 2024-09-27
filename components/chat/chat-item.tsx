@@ -1,19 +1,20 @@
 "use client"
-import { Member, MemberRule, Profile } from '@prisma/client';
-import React, { FC, useEffect, useState } from 'react'
-import { UserAvatar } from '../user-avatar';
+import {Member, MemberRule, Profile} from '@prisma/client';
+import React, {FC, useEffect, useState} from 'react'
+import {UserAvatar} from '../user-avatar';
 import ActionTooltip from '../action-tooltip';
-import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash } from 'lucide-react';
+import {Edit, FileIcon, ShieldAlert, ShieldCheck, Trash} from 'lucide-react';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import {cn} from '@/lib/utils';
 import * as z from 'zod'
 import qs from 'query-string'
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem } from '../ui/form';
-import { Input } from '../ui/input';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {Form, FormControl, FormField, FormItem} from '../ui/form';
+import {Input} from '../ui/input';
 import {Button} from "@/components/ui/button";
 import axios from "axios";
+import {useModal} from "@/hooks/use-modal-hooks";
 
 interface ChatItemProps {
     id: string;
@@ -32,17 +33,29 @@ interface ChatItemProps {
 
 const roleIconMap = {
     "GUEST": null,
-    "MODERATOR": <ShieldCheck className="h-4 w-4 ml-2 text-indigo-500" />,
-    "ADMIN": <ShieldAlert className="h-4 w-4 ml-2 text-rose-500" />
+    "MODERATOR": <ShieldCheck className="h-4 w-4 ml-2 text-indigo-500"/>,
+    "ADMIN": <ShieldAlert className="h-4 w-4 ml-2 text-rose-500"/>
 }
 
 const formSchema = z.object({
     content: z.string().min(1)
 })
 
-const ChatItem: FC<ChatItemProps> = ({ id, content, member, timestamp, fileUrl, deleted, currentMember, isUpdated, socketQuery, socketUrl }) => {
+const ChatItem: FC<ChatItemProps> = ({
+                                         id,
+                                         content,
+                                         member,
+                                         timestamp,
+                                         fileUrl,
+                                         deleted,
+                                         currentMember,
+                                         isUpdated,
+                                         socketQuery,
+                                         socketUrl
+                                     }) => {
     const [isEditing, setIsEditing] = useState<boolean>(false)
-    const [isDeleting, setIsDeleting] = useState<boolean>(false)
+    const {onOpen} = useModal()
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -75,7 +88,9 @@ const ChatItem: FC<ChatItemProps> = ({ id, content, member, timestamp, fileUrl, 
             })
 
             await axios.patch(url, values)
-        } catch(e) {
+            form.reset()
+            setIsEditing(false)
+        } catch (e) {
             console.log(e)
         }
     }
@@ -85,7 +100,7 @@ const ChatItem: FC<ChatItemProps> = ({ id, content, member, timestamp, fileUrl, 
             <div className='group flex gap-x-2 items-start w-full'>
                 <div className='cursor-pointer hover:drop-shadow-md transition'>
                     <div className='flex gap-x-2 '>
-                        <UserAvatar src={member.profile.imageUrl} />
+                        <UserAvatar src={member.profile.imageUrl}/>
                         <div className="flex flex-col w-full">
                             <div className='flex items-center gap-x-2'>
                                 <div className="flex items-center">
@@ -100,7 +115,11 @@ const ChatItem: FC<ChatItemProps> = ({ id, content, member, timestamp, fileUrl, 
                                     {timestamp}
                                 </span>
                             </div>
-                            {!isEditing && <p>{content}</p>}
+                            {!isEditing && (
+                                <p className={deleted ? "italic text-zinc-500 dark:text-zinc-400 text-xs mt-1" : ""}>
+                                    {content}
+                                </p>
+                            )}
                         </div>
                     </div>
                     {
@@ -123,7 +142,7 @@ const ChatItem: FC<ChatItemProps> = ({ id, content, member, timestamp, fileUrl, 
                     {
                         isPdf && (
                             <div className="relative flex items-center p-2 mt-2 rounded-md bg-backgroud/10">
-                                <FileIcon className="rounded-full h-10 w-10 fill-indigo-200 stroke-indigo-400" />
+                                <FileIcon className="rounded-full h-10 w-10 fill-indigo-200 stroke-indigo-400"/>
                                 <a
                                     href={fileUrl}
                                     target="_blank"
@@ -152,11 +171,12 @@ const ChatItem: FC<ChatItemProps> = ({ id, content, member, timestamp, fileUrl, 
                     }
                     {!fileUrl && isEditing && (
                         <Form {...form}>
-                            <form className="flex items-center w-full gap-x-2 pt-2" onSubmit={form.handleSubmit(onSubmit)}>
+                            <form className="flex items-center w-full gap-x-2 pt-2"
+                                  onSubmit={form.handleSubmit(onSubmit)}>
                                 <FormField
                                     control={form.control}
                                     name="content"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem className="flex-1">
                                             <FormControl>
                                                 <div className='relative w-full'>
@@ -181,7 +201,8 @@ const ChatItem: FC<ChatItemProps> = ({ id, content, member, timestamp, fileUrl, 
                 </div>
             </div>
             {canDeleteMessage && (
-                <div className='cursor-pointer hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-white dark:bg-zinc-800 border rounded-sm'>
+                <div
+                    className='cursor-pointer hidden group-hover:flex items-center gap-x-2 absolute p-1 -top-2 right-5 bg-white dark:bg-zinc-800 border rounded-sm'>
                     {
                         canEditMessage && (
                             <ActionTooltip label="Edit">
@@ -194,7 +215,7 @@ const ChatItem: FC<ChatItemProps> = ({ id, content, member, timestamp, fileUrl, 
                     }
                     <ActionTooltip label="Delete">
                         <Trash
-                            onClick={() => setIsDeleting(true)}
+                            onClick={() => onOpen("deleteMessage", {apiUrl: `${socketUrl}/${id}`, query: socketQuery})}
                             className="w-4 h-4 text-zinc-500 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition"
                         />
                     </ActionTooltip>
