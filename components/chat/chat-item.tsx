@@ -1,20 +1,21 @@
 "use client"
-import {Member, MemberRule, Profile} from '@prisma/client';
-import React, {FC, useEffect, useState} from 'react'
-import {UserAvatar} from '../user-avatar';
+import { Member, MemberRule, Profile } from '@prisma/client';
+import React, { FC, useEffect, useState } from 'react'
+import { UserAvatar } from '../user-avatar';
 import ActionTooltip from '../action-tooltip';
-import {Edit, FileIcon, ShieldAlert, ShieldCheck, Trash} from 'lucide-react';
+import { Edit, FileIcon, ShieldAlert, ShieldCheck, Trash } from 'lucide-react';
 import Image from 'next/image';
-import {cn} from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import * as z from 'zod'
 import qs from 'query-string'
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {Form, FormControl, FormField, FormItem} from '../ui/form';
-import {Input} from '../ui/input';
-import {Button} from "@/components/ui/button";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form, FormControl, FormField, FormItem } from '../ui/form';
+import { Input } from '../ui/input';
+import { Button } from "@/components/ui/button";
 import axios from "axios";
-import {useModal} from "@/hooks/use-modal-hooks";
+import { useModal } from "@/hooks/use-modal-hooks";
+import { useParams, useRouter } from 'next/navigation';
 
 interface ChatItemProps {
     id: string;
@@ -33,8 +34,8 @@ interface ChatItemProps {
 
 const roleIconMap = {
     "GUEST": null,
-    "MODERATOR": <ShieldCheck className="h-4 w-4 ml-2 text-indigo-500"/>,
-    "ADMIN": <ShieldAlert className="h-4 w-4 ml-2 text-rose-500"/>
+    "MODERATOR": <ShieldCheck className="h-4 w-4 ml-2 text-indigo-500" />,
+    "ADMIN": <ShieldAlert className="h-4 w-4 ml-2 text-rose-500" />
 }
 
 const formSchema = z.object({
@@ -42,19 +43,28 @@ const formSchema = z.object({
 })
 
 const ChatItem: FC<ChatItemProps> = ({
-                                         id,
-                                         content,
-                                         member,
-                                         timestamp,
-                                         fileUrl,
-                                         deleted,
-                                         currentMember,
-                                         isUpdated,
-                                         socketQuery,
-                                         socketUrl
-                                     }) => {
+    id,
+    content,
+    member,
+    timestamp,
+    fileUrl,
+    deleted,
+    currentMember,
+    isUpdated,
+    socketQuery,
+    socketUrl
+}) => {
     const [isEditing, setIsEditing] = useState<boolean>(false)
-    const {onOpen} = useModal()
+    const { onOpen } = useModal()
+    const params = useParams()
+    const router = useRouter()
+
+    const onMemberClick = () => {
+        if (member.id === currentMember.id) {
+            return;
+        }
+        router.push(`/servers/${params?.serverId}/conversation/${member.id}`)
+    }
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -100,11 +110,13 @@ const ChatItem: FC<ChatItemProps> = ({
             <div className='group flex gap-x-2 items-start w-full'>
                 <div className='cursor-pointer hover:drop-shadow-md transition'>
                     <div className='flex gap-x-2 '>
-                        <UserAvatar src={member.profile.imageUrl}/>
+                        <div onClick={onMemberClick}>
+                            <UserAvatar src={member.profile.imageUrl} />
+                        </div>
                         <div className="flex flex-col w-full">
                             <div className='flex items-center gap-x-2'>
                                 <div className="flex items-center">
-                                    <p className='font-semibold text-sm hover:underline cursor-pointer'>
+                                    <p onClick={onMemberClick} className='font-semibold text-sm hover:underline cursor-pointer'>
                                         {member.profile.name}
                                     </p>
                                     <ActionTooltip label={member.role}>
@@ -142,7 +154,7 @@ const ChatItem: FC<ChatItemProps> = ({
                     {
                         isPdf && (
                             <div className="relative flex items-center p-2 mt-2 rounded-md bg-backgroud/10">
-                                <FileIcon className="rounded-full h-10 w-10 fill-indigo-200 stroke-indigo-400"/>
+                                <FileIcon className="rounded-full h-10 w-10 fill-indigo-200 stroke-indigo-400" />
                                 <a
                                     href={fileUrl}
                                     target="_blank"
@@ -172,11 +184,11 @@ const ChatItem: FC<ChatItemProps> = ({
                     {!fileUrl && isEditing && (
                         <Form {...form}>
                             <form className="flex items-center w-full gap-x-2 pt-2"
-                                  onSubmit={form.handleSubmit(onSubmit)}>
+                                onSubmit={form.handleSubmit(onSubmit)}>
                                 <FormField
                                     control={form.control}
                                     name="content"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem className="flex-1">
                                             <FormControl>
                                                 <div className='relative w-full'>
@@ -215,7 +227,7 @@ const ChatItem: FC<ChatItemProps> = ({
                     }
                     <ActionTooltip label="Delete">
                         <Trash
-                            onClick={() => onOpen("deleteMessage", {apiUrl: `${socketUrl}/${id}`, query: socketQuery})}
+                            onClick={() => onOpen("deleteMessage", { apiUrl: `${socketUrl}/${id}`, query: socketQuery })}
                             className="w-4 h-4 text-zinc-500 dark:text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition"
                         />
                     </ActionTooltip>
