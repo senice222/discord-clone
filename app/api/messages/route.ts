@@ -25,10 +25,10 @@ export async function GET(req: Request) {
         if (cursor) {
             messages = await db.message.findMany({
                 take: MESSAGE_BATCH,
-                // skip: 1,
-                // cursor: {
-                //   id: cursor,
-                // },
+                skip: 1,
+                cursor: {
+                  id: cursor,
+                },
                 where: {
                     channelId,
                 },
